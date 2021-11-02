@@ -1,3 +1,6 @@
+# Other ignores
+**.vscode
+
 # Compiled Lua sources
 luac.out
 
