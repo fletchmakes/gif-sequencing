@@ -25,6 +25,40 @@ local sequence = ...
 -----------------------------------
 -- HELPER METHODS
 -----------------------------------
+local function getLayerGroups(sprite)
+    local result = {}
+
+    for _,layer in ipairs(sprite.layers) do
+        if (layer.isGroup) then
+            table.insert(result, layer.name)
+        end
+    end
+
+    return result
+end
+
+local function layerGroupWindow(sprite)
+    local dialog = Dialog("Select Layer Group")
+
+    dialog:combobox {
+        id="layerGroupName",
+        options=getLayerGroups(sprite)
+    }
+
+    dialog:button {
+        id="cancel",
+        text="Cancel"
+    }
+    
+    dialog:button {
+        id="save",
+        text="Save"
+    }
+
+    return dialog
+end
+
+
 local function readAllTags(sprite)
     local tags = {}
 
@@ -108,7 +142,16 @@ end
 -- tempSprite is the reference to the file we will be modifying heavily before exporting, then abandoning
 local origSprite = app.activeSprite
 local tempSprite = Sprite(origSprite)
+
 tempSprite.filename = app.fs.joinPath(app.fs.filePath(origSprite.filename),"EXPORTING_"..app.fs.fileName(origSprite.filename))
+
+-- change the filename if a layergroup is selected
+local layerGroupWindow = layerGroupWindow(tempSprite)
+layerGroupWindow:show{ wait=true }
+
+if (layerGroupWindow.data.save) then
+    tempSprite.filename = app.fs.joinPath(app.fs.filePath(origSprite.filename),layerGroupWindow.data.layerGroupName)  
+end
 
 -- delete all of the invisible layers because they are not needed, then flatten
 deleteAllHiddenLayers(tempSprite)
