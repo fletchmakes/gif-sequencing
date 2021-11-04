@@ -255,7 +255,7 @@ local function editTagWindow(tag)
 
     dialog:combobox {
         id="tag",
-        label="tag",
+        label="Tag",
         option="",
         options=getListOfTags()
     }
@@ -535,7 +535,10 @@ else
     end
 
     if (prefs.last_open ~= nil) then
-        sequence = deepcopy(prefs.last_open)
+        -- validate that the sequence we are loading is valid. if it's not, continue loading a blank sequence instead
+        if (validatePresetHasNecessaryTags(prefs.last_open)) then
+            sequence = deepcopy(prefs.last_open)
+        end
     end
 
     local exit = { action=nil }
