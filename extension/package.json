@@ -2,7 +2,7 @@
     "name": "gif-sequencing",
     "displayName": "Gif Sequencing",
     "description": "Export your sprite as a gif with the tags in a custom order!",
-    "version": "1.0",
+    "version": "1.1",
     "author": { "name": "David Fletcher",
                 "email": "david.login@aol.com",
                 "url": "https://github.com/david-fletcher/gif-sequencing" },

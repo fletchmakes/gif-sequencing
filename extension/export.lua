@@ -147,7 +147,7 @@ local tempSprite = Sprite(origSprite)
 local layerGroupWindow = layerGroupWindow(tempSprite)
 layerGroupWindow:show{ wait=true }
 
-if (layerGroupWindow.data.save) and (layerGroupWindow.data.layerGroupName ~= "") then
+if (layerGroupWindow.data.save) and (layerGroupWindow.data.layerGroupName ~= nil) and (layerGroupWindow.data.layerGroupName ~= "") then
     tempSprite.filename = app.fs.joinPath(app.fs.filePath(origSprite.filename),layerGroupWindow.data.layerGroupName)  
 end
 
