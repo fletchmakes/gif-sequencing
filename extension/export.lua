@@ -108,7 +108,6 @@ end
 -- tempSprite is the reference to the file we will be modifying heavily before exporting, then abandoning
 local origSprite = app.activeSprite
 local tempSprite = Sprite(origSprite)
-tempSprite.filename = app.fs.joinPath(app.fs.filePath(origSprite.filename),"EXPORTING_"..app.fs.fileName(origSprite.filename))
 
 -- delete all of the invisible layers because they are not needed, then flatten
 deleteAllHiddenLayers(tempSprite)
