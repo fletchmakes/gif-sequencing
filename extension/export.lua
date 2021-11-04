@@ -143,13 +143,11 @@ end
 local origSprite = app.activeSprite
 local tempSprite = Sprite(origSprite)
 
-tempSprite.filename = app.fs.joinPath(app.fs.filePath(origSprite.filename),"EXPORTING_"..app.fs.fileName(origSprite.filename))
-
 -- change the filename if a layergroup is selected
 local layerGroupWindow = layerGroupWindow(tempSprite)
 layerGroupWindow:show{ wait=true }
 
-if (layerGroupWindow.data.save) then
+if (layerGroupWindow.data.save) and (layerGroupWindow.data.layerGroupName ~= "") then
     tempSprite.filename = app.fs.joinPath(app.fs.filePath(origSprite.filename),layerGroupWindow.data.layerGroupName)  
 end
 
