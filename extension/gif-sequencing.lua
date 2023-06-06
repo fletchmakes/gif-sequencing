@@ -509,6 +509,7 @@ local function mainWindow(sequence, presets, exit)
         text="Export Sequence",
         onclick=function()
             exit.action = "export"
+            exit.sequence = deepcopy(sequence)
             dialog:close()
         end
     }
@@ -541,17 +542,17 @@ else
         end
     end
 
-    local exit = { action=nil }
+    local exit = { action=nil, sequence=nil }
     mainWindow(sequence, prefs.presets, exit):show{ wait=true }
-    
+
     if (exit.action == "export") then
         -- DEVELOPMENT VERSION
         -- local exportChunk = app.fs.joinPath(app.fs.userConfigPath, "scripts", "export.lua")
         -- PRODUCTION VERSION
         local exportChunk = app.fs.joinPath(app.fs.userConfigPath, "extensions", "gif-sequencing", "export.lua")
         -- load the lua script into a Lua chunk, then execute it with the parameter plugin.preferences
-        loadfile(exportChunk)(sequence)
+        loadfile(exportChunk)(exit.sequence)
     end
 
-    prefs.last_open = deepcopy(sequence)
+    prefs.last_open = deepcopy(exit.sequence)
 end
