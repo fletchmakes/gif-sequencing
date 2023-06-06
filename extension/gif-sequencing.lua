@@ -86,7 +86,7 @@ end
 -----------------------------------
 -- CREATE ERROR DIALOG
 -----------------------------------
--- param: str - a string value that will be displayed to the user (usually an error message)
+-- param: table - a table of string values that will be displayed to the user (usually an error message)
 -- param: dialog - the Dialog object (if any) that spawned this error message
 -- param: exit - a boolean value; 0 to keep dialog open, and 1 to close dialog
 -----------------------------------
@@ -94,8 +94,8 @@ end
 -- If you call this from a Dialog function, you can optionally close the dialog to end user interaction
 -- and prevent further errors (making the user try again).
 -----------------------------------
-local function create_error(str, dialog, exit)
-    app.alert(str)
+local function create_error(table, dialog, exit)
+    app.alert{title="There was an error.", text=table}
     if (exit == 1) then dialog:close() end
 end
 
@@ -173,9 +173,12 @@ local function validatePresetHasNecessaryTags(sequence)
     -- if the sequence is nil, just pass back true (probably a "None" preset)
     if (sequence == nil) then return true end
 
+    local tagNamesMissing = {}
+
     local foundAll = true
     local foundOne = false
     for _,seq_t in pairs(sequence.tags) do
+        foundOne = false
         for _,spr_t in ipairs(app.activeSprite.tags) do
             if (seq_t.name == spr_t.name) then
                 foundOne = true
@@ -184,12 +187,12 @@ local function validatePresetHasNecessaryTags(sequence)
         end
 
         if (not foundOne) then
+            table.insert(tagNamesMissing, seq_t.name)
             foundAll = false
-            break
         end
     end
 
-    return foundAll
+    return foundAll, tagNamesMissing
 end
 
 -----------------------------------
@@ -322,10 +325,14 @@ local function mainWindow(sequence, presets, exit)
         options=presetNames,
         option=sequence.preset,
         onchange=function()
-            local isValid = validatePresetHasNecessaryTags(presets[presetMap[dialog.data.presets]])
+            local isValid, tagNamesMissing = validatePresetHasNecessaryTags(presets[presetMap[dialog.data.presets]])
 
             if (not isValid) then
-                create_error("You cannot use this preset since the current document does not have all of the tags needed for this preset.", nil, 0)
+                local message = {"You cannot use this preset since the current document does not have all of the tags needed for this preset.", "Missing tags:"}
+                for _,name in ipairs(tagNamesMissing) do
+                    table.insert(message, name)
+                end
+                create_error(message, nil, 0)
                 refresh(dialog)
                 return
             end
@@ -524,7 +531,7 @@ end
 -- first check to see if any tags exist in the sprite
 local numTags = #getListOfTags()
 if (numTags == 0) then
-    create_error("You cannot use this option if there are no tags defined.", nil, 0)
+    create_error({"You cannot use this option if there are no tags defined."}, nil, 0)
 else
     local sequence = {
         preset="None",
@@ -537,7 +544,8 @@ else
 
     if (prefs.last_open ~= nil) then
         -- validate that the sequence we are loading is valid. if it's not, continue loading a blank sequence instead
-        if (validatePresetHasNecessaryTags(prefs.last_open)) then
+        local isValid, tagNamesMissing = validatePresetHasNecessaryTags(prefs.last_open)
+        if (isValid) then
             sequence = deepcopy(prefs.last_open)
         end
     end
